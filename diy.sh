@@ -96,7 +96,7 @@ UPDATE_PACKAGE "luci-app-tailscale" "asvow/luci-app-tailscale" "main"
 
 keywords_to_delete=(
     "luci-app-wol" "luci-i18n-wol-zh-cn" "CONFIG_TARGET_INITRAMFS" "LSUSB" "mihomo"
-    "smartdns" "kucat" "bootstrap" "mosdns" "quickstart" "istorex" "store"
+    "smartdns" "kucat" "bootstrap" "mosdns" "quickstart" "istorex" "store" "lucky" "oaf" "athena"
 )
 
 
