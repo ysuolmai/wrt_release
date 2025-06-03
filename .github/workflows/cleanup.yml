@@ -1,0 +1,97 @@
+name: Cleanup Old Runs and Releases for All Models
+
+on:
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MODELS: |
+    aliyun_ap8220_immwrt
+    cmcc_rax3000m_immwrt
+    jdcloud_ax6000_immwrt
+    jdcloud_ipq60xx_immwrt
+    jdcloud_ipq60xx_libwrt
+    jdcloud_ipq60xx_NOWIFI_libwrt
+    n1_immwrt
+    redmi_ax5_immwrt
+    redmi_ax6_immwrt
+    redmi_ax6_libwrt
+    redmi_ax6000_immwrt21
+    zn_m2_immwrt
+    zn_m2_libwrt
+    x64_immwrt
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Iterate Over Models
+        run: |
+          # Convert MODELS to an array
+          IFS=$'\n' read -d '' -r -a model_array <<< "$MODELS"
+
+          for model in "${model_array[@]}"; do
+            echo "Processing model: $model"
+
+            # Get the latest successful run ID for the model
+            LATEST_RUN=$(gh run list \
+              --workflow "Release WRT" \
+              --status success \
+              --json databaseId,displayTitle \
+              --jq "[.[] | select(.displayTitle | contains(\"$model\"))] | sort_by(.createdAt) | last | .databaseId" || echo "")
+            
+            if [ -n "$LATEST_RUN" ]; then
+              echo "Latest successful run ID for $model: $LATEST_RUN"
+              
+              # Get all run IDs for the model, excluding the latest successful one
+              RUN_IDS=$(gh run list \
+                --workflow "Release WRT" \
+                --json databaseId,displayTitle \
+                --jq "[.[] | select(.displayTitle | contains(\"$model\")) | .databaseId] | .[] | select(. != \"$LATEST_RUN\")" || echo "")
+              
+              # Delete old runs
+              if [ -n "$RUN_IDS" ]; then
+                for run_id in $RUN_IDS; do
+                  echo "Deleting run ID: $run_id for $model"
+                  gh run delete "$run_id" || echo "Failed to delete run $run_id"
+                done
+              else
+                echo "No old runs to delete for $model"
+              fi
+            else
+              echo "No successful runs found for $model"
+            fi
+
+            # Get the latest release tag for the model
+            LATEST_RELEASE=$(gh release list \
+              --json tagName \
+              --jq "[.[] | select(.tagName | contains(\"$model\"))] | sort_by(.createdAt) | last | .tagName" || echo "")
+            
+            if [ -n "$LATEST_RELEASE" ]; then
+              echo "Latest release tag for $model: $LATEST_RELEASE"
+              
+              # Get all release tags for the model, excluding the latest one
+              RELEASE_TAGS=$(gh release list \
+                --json tagName \
+                --jq "[.[] | select(.tagName | contains(\"$model\")) | .tagName] | .[] | select(. != \"$LATEST_RELEASE\")" || echo "")
+              
+              # Delete old releases
+              if [ -n "$RELEASE_TAGS" ]; then
+                for tag in $RELEASE_TAGS; do
+                  echo "Deleting release tag: $tag for $model"
+                  gh release delete "$tag" --yes || echo "Failed to delete release $tag"
+                done
+              else
+                echo "No old releases to delete for $model"
+              fi
+            else
+              echo "No releases found for $model"
+            fi
+
+            echo "Finished processing $model"
+            echo "--------------------------------"
+          done
