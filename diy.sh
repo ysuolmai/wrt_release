@@ -106,7 +106,7 @@ keywords_to_delete=(
 #[[ $FIRMWARE_TAG == *"EMMC"* ]] && keywords_to_delete+=("cmiot_ax18" "qihoo_v6" "redmi_ax5=y" "zn_m2")
 
 for keyword in "${keywords_to_delete[@]}"; do
-    sed -i "/$keyword/d" $BASE_PATH/deconfig/$Dev.config
+    sed -i "/$keyword/d" $BASE_PATH/deconfig/$FIRMWARE_TAG.config
 done
 
 
@@ -232,7 +232,7 @@ fi
 
 # Append configuration lines to .config
 for line in "${provided_config_lines[@]}"; do
-    echo "$line" >> $BASE_PATH/deconfig/$Dev.config
+    echo "$line" >> $BASE_PATH/deconfig/$FIRMWARE_TAG.config
 done
 
 #./scripts/feeds update -a
