@@ -1,4 +1,4 @@
-name: Cleanup Old Runs and Releases for All Models
+name: Cleanup
 
 on:
   workflow_dispatch:
