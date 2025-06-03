@@ -251,7 +251,7 @@ find ./ -name "dark.less" -exec sed -i 's/#5e72e4/#31A1A1/g; s/#483d8b/#31A1A1/g
 install -Dm755 "$BASE_PATH/patches/99_ttyd-nopass.sh" "package/base-files/files/etc/uci-defaults/99_ttyd-nopass"
 
 
-install -Dm755 "$BASE_PATH/patches/99_set_argon_primary.sh" "package/base-files/files/etc/uci-defaults/99_set_argon_primary"
+install -Dm755 "$BASE_PATH/patches/990_set_argon_primary" "package/base-files/files/etc/uci-defaults/990_set_argon_primary"
 install -Dm755 "$BASE_PATH/patches/99-distfeeds.conf" "package/emortal/default-settings/files/99-distfeeds.conf"
 sed -i "/define Package\/default-settings\/install/a\\
 \\t\$(INSTALL_DIR) \$(1)/etc\\n\
