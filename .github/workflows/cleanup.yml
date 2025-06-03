@@ -1,4 +1,4 @@
-name: Cleanup
+name: Cleanup Old Runs and Releases for All Models
 
 on:
   workflow_dispatch:
@@ -29,35 +29,51 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify GitHub CLI
+        run: |
+          gh --version
+          echo "Checking GitHub token presence..."
+          if [ -z "$GITHUB_TOKEN" ]; then
+            echo "Error: GITHUB_TOKEN is not set"
+            exit 1
+          fi
+
       - name: Iterate Over Models
         run: |
+          # Disable exit on error to continue processing models
+          set +e
+          
           # Convert MODELS to an array
-          IFS=$'\n' read -d '' -r -a model_array <<< "$MODELS"
+          IFS=$'\n' read -d '' -r -a model_array <<< "$MODELS" || true
+          echo "Models to process: ${model_array[@]}"
 
           for model in "${model_array[@]}"; do
             echo "Processing model: $model"
 
             # Get the latest successful run ID for the model
+            echo "Fetching latest successful run for $model..."
             LATEST_RUN=$(gh run list \
               --workflow "Release WRT" \
               --status success \
-              --json databaseId,displayTitle \
-              --jq "[.[] | select(.displayTitle | contains(\"$model\"))] | sort_by(.createdAt) | last | .databaseId" || echo "")
+              --json databaseId,displayTitle,createdAt \
+              --jq "[.[] | select(.displayTitle | test(\"Release - $model\"))] | sort_by(.createdAt) | last | .databaseId" 2>/dev/null || echo "")
             
             if [ -n "$LATEST_RUN" ]; then
               echo "Latest successful run ID for $model: $LATEST_RUN"
               
               # Get all run IDs for the model, excluding the latest successful one
+              echo "Fetching all runs for $model..."
               RUN_IDS=$(gh run list \
                 --workflow "Release WRT" \
                 --json databaseId,displayTitle \
-                --jq "[.[] | select(.displayTitle | contains(\"$model\")) | .databaseId] | .[] | select(. != \"$LATEST_RUN\")" || echo "")
+                --jq "[.[] | select(.displayTitle | test(\"Release - $model\")) | .databaseId] | .[] | select(. != \"$LATEST_RUN\")" 2>/dev/null || echo "")
               
               # Delete old runs
               if [ -n "$RUN_IDS" ]; then
+                echo "Found runs to delete for $model: $RUN_IDS"
                 for run_id in $RUN_IDS; do
                   echo "Deleting run ID: $run_id for $model"
-                  gh run delete "$run_id" || echo "Failed to delete run $run_id"
+                  gh run delete "$run_id" && echo "Deleted run $run_id" || echo "Failed to delete run $run_id"
                 done
               else
                 echo "No old runs to delete for $model"
@@ -67,23 +83,26 @@ jobs:
             fi
 
             # Get the latest release tag for the model
+            echo "Fetching latest release for $model..."
             LATEST_RELEASE=$(gh release list \
-              --json tagName \
-              --jq "[.[] | select(.tagName | contains(\"$model\"))] | sort_by(.createdAt) | last | .tagName" || echo "")
+              --json tagName,createdAt \
+              --jq "[.[] | select(.tagName | contains(\"$model\"))] | sort_by(.createdAt) | last | .tagName" 2>/dev/null || echo "")
             
             if [ -n "$LATEST_RELEASE" ]; then
               echo "Latest release tag for $model: $LATEST_RELEASE"
               
               # Get all release tags for the model, excluding the latest one
+              echo "Fetching all releases for $model..."
               RELEASE_TAGS=$(gh release list \
                 --json tagName \
-                --jq "[.[] | select(.tagName | contains(\"$model\")) | .tagName] | .[] | select(. != \"$LATEST_RELEASE\")" || echo "")
+                --jq "[.[] | select(.tagName | contains(\"$model\")) | .tagName] | .[] | select(. != \"$LATEST_RELEASE\")" 2>/dev/null || echo "")
               
               # Delete old releases
               if [ -n "$RELEASE_TAGS" ]; then
+                echo "Found releases to delete for $model: $RELEASE_TAGS"
                 for tag in $RELEASE_TAGS; do
                   echo "Deleting release tag: $tag for $model"
-                  gh release delete "$tag" --yes || echo "Failed to delete release $tag"
+                  gh release delete "$tag" --yes && echo "Deleted release $tag" || echo "Failed to delete release $tag"
                 done
               else
                 echo "No old releases to delete for $model"
