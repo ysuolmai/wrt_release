@@ -56,17 +56,13 @@ git clone --depth=1 https://github.com/esirplayground/luci-app-poweroff package/
 #UPDATE_PACKAGE "argon" "sbwml/luci-theme-argon" "openwrt-24.10"
 
 
+UPDATE_PACKAGE "partexp" "sirpdboy/luci-app-partexp" "main"
 
 #DDNS-go
 git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
 
 #luci-app-zerotier
 git clone https://github.com/rufengsuixing/luci-app-zerotier.git package/luci-app-zerotier
-
-
-#tailscale
-#sed -i '/\/etc\/init\.d\/tailscale/d;/\/etc\/config\/tailscale/d;' feeds/packages/net/tailscale/Makefile
-#git clone https://github.com/asvow/luci-app-tailscale package/luci-app-tailscale
 
 #gecoosac
 git clone https://github.com/lwb1978/openwrt-gecoosac package/openwrt-gecoosac
@@ -171,6 +167,7 @@ fi
 
 
 [[ $FIRMWARE_TAG == *"jdcloud"* ]] && provided_config_lines+=(
+    "CONFIG_PACKAGE_luci-app-partexp=y"
     "CONFIG_PACKAGE_luci-app-diskman=y"
     "CONFIG_PACKAGE_luci-i18n-diskman-zh-cn=y"
     "CONFIG_PACKAGE_luci-app-docker=m"
