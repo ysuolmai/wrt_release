@@ -768,9 +768,9 @@ main() {
     clean_up
     reset_feeds_conf
     update_feeds
+    remove_unwanted_packages
     chmod +x $BASE_PATH/diy.sh
     $BASE_PATH/diy.sh $Dev $BASE_PATH $BUILD_DIR
-    remove_unwanted_packages
     update_homeproxy
     fix_default_set
     fix_miniupnpd
