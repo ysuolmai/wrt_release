@@ -261,3 +261,4 @@ sed -i "/exit 0/i\\
 sed -ri \'/check_signature/s@^[^#]@#&@\' /etc/opkg.conf\n" "package/emortal/default-settings/files/99-default-settings"
 
 
+sed -i 's/"admin\/services\/samba4"/"admin\/nas\/samba4"/' feeds/luci/applications/luci-app-samba4/root/usr/share/luci/menu.d/luci-app-samba4.json
