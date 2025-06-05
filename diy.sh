@@ -59,7 +59,7 @@ git clone --depth=1 https://github.com/esirplayground/luci-app-poweroff package/
 UPDATE_PACKAGE "partexp" "sirpdboy/luci-app-partexp" "main"
 
 #DDNS-go
-git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
+#git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
 
 #luci-app-zerotier
 git clone https://github.com/rufengsuixing/luci-app-zerotier.git package/luci-app-zerotier
@@ -89,6 +89,8 @@ UPDATE_PACKAGE "speedtest-cli" "https://github.com/sbwml/openwrt_pkgs.git" "main
 
 UPDATE_PACKAGE "luci-app-adguardhome" "https://github.com/ysuolmai/luci-app-adguardhome.git" "master"
 UPDATE_PACKAGE "luci-app-tailscale" "asvow/luci-app-tailscale" "main"
+
+UPDATE_PACKAGE "luci-app-ddns-go ddns-go" "sirpdboy/luci-app-ddns-go" "main" "pkg"
 
 keywords_to_delete=(
     "luci-app-wol" "luci-i18n-wol-zh-cn" "CONFIG_TARGET_INITRAMFS" "LSUSB" "mihomo"
