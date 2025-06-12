@@ -81,7 +81,7 @@ UPDATE_PACKAGE "xray-core xray-plugin dns2tcp dns2socks haproxy hysteria \
         taskd luci-lib-xterm luci-lib-taskd luci-app-ssr-plus luci-app-passwall2 \
         luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest \
         luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-openclash mihomo \
-        luci-app-nikki" "kenzok8/small-package" "main" "pkg"
+        luci-app-nikki luci-app-ddns-go ddns-go" "kenzok8/small-package" "main" "pkg"
 
 #speedtest
 UPDATE_PACKAGE "luci-app-netspeedtest" "https://github.com/sbwml/openwrt_pkgs.git" "main" "pkg"
@@ -90,7 +90,7 @@ UPDATE_PACKAGE "speedtest-cli" "https://github.com/sbwml/openwrt_pkgs.git" "main
 UPDATE_PACKAGE "luci-app-adguardhome" "https://github.com/ysuolmai/luci-app-adguardhome.git" "master"
 UPDATE_PACKAGE "luci-app-tailscale" "asvow/luci-app-tailscale" "main"
 
-UPDATE_PACKAGE "luci-app-ddns-go ddns-go" "sirpdboy/luci-app-ddns-go" "main" "pkg"
+#UPDATE_PACKAGE "luci-app-ddns-go ddns-go" "sirpdboy/luci-app-ddns-go" "main" "pkg"
 
 keywords_to_delete=(
     "luci-app-wol" "luci-i18n-wol-zh-cn" "CONFIG_TARGET_INITRAMFS" "LSUSB" "mihomo"
